@@ -23,7 +23,12 @@ var rootCmd = &cobra.Command{
 	Long:  `Dora is a traditional Chinese percussion instruments of Buddhist origin. It plays a solemn sound.`,
 	Args:  cobra.MinimumNArgs(0),
 	Run: func(cmd *cobra.Command, args []string) {
-		runDora()
+		isSilent, _ := cmd.Flags().GetBool("silent")
+		if isSilent {
+			println("🔔 Done")
+		} else {
+			runDora()
+		}
 	},
 }
 
@@ -59,5 +64,5 @@ func Execute(embedFs embed.FS) {
 }
 
 func init() {
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	rootCmd.PersistentFlags().BoolP("silent", "s", false, "Mute dora")
 }
