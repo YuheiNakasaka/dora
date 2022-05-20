@@ -1,8 +1,12 @@
 package cmd
 
 import (
+	"bytes"
+	"embed"
+	"io/ioutil"
 	"log"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/faiface/beep"
@@ -10,6 +14,8 @@ import (
 	"github.com/faiface/beep/speaker"
 	"github.com/spf13/cobra"
 )
+
+var fs embed.FS
 
 var rootCmd = &cobra.Command{
 	Use:   "dora",
@@ -22,11 +28,11 @@ var rootCmd = &cobra.Command{
 }
 
 func runDora() {
-	f, err := os.Open("dora.mp3")
+	f, err := fs.ReadFile(filepath.Join("resources", "dora.mp3"))
 	if err != nil {
 		log.Fatal(err)
 	}
-	streamer, format, err := mp3.Decode(f)
+	streamer, format, err := mp3.Decode(ioutil.NopCloser(bytes.NewReader(f)))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -44,7 +50,8 @@ func runDora() {
 	<-done
 }
 
-func Execute() {
+func Execute(embedFs embed.FS) {
+	fs = embedFs
 	if err := rootCmd.Execute(); err != nil {
 		log.Fatal(err)
 		os.Exit(1)
